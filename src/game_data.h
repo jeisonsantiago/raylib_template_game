@@ -14,7 +14,7 @@ struct GameData{
     Vector2 mouse_block_pos = {};
 
     // edits
-    // int creativeSelectedBlock = Block::dirt;
+    int selected_texture_block = 0;
     Vector2 selection_start = {};
     Vector2 selection_ends = {};
 
@@ -22,7 +22,7 @@ struct GameData{
     int selected_block = -1;
 
     bool editor_mode = false;
-    bool mouse_over_editor_UI = false;
+    bool mouse_over_editor_ui = false;
 
     bool is_selecting = false;
     bool mouse_click_selection = false;
@@ -42,6 +42,9 @@ struct GameData{
 
     // entities
     EntityArray entities;
+
+    // render bucket
+    std::vector<int> render_bucket[MAX_LAYERS];
 
     // std::vector<std::uint64_t> toRemoveEntities;
     // std::vector<std::unique_ptr<UIElement>> uiElements;

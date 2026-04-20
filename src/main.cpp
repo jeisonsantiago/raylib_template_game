@@ -75,6 +75,7 @@ int main()
         case Scene::GamePlay:
             // update
             // render
+            game_play.update(deltaTime,*game_context);
             game_play.render(deltaTime,*game_context);
             break;
         case Scene::MainMenu:

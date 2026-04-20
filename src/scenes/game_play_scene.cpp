@@ -1,13 +1,13 @@
 #include "game_play_scene.h"
 
-
 // row    = index / width
 // column = index % width
 // index = (row * width) + column
 
 #include "game_context.h"
+#include "editor.h"
 
-
+#include "systems/render_system.h"
 
 void GamePlayScene::init(GameContext &context)
 {
@@ -22,13 +22,59 @@ void GamePlayScene::init(GameContext &context)
             int index = (y * map.w) + x;
 
             // create entity
-            auto e_ref = game_data.entities.add(Type::MapTileGround);
+            auto e_ref = game_data.entities.add(Type::Tile);
             auto &e = game_data.entities.get(e_ref);
             e.sprite.textureAsset = &context.asset_manager.world;
             e.sprite.textureIndex = 103;
+            e.sprite.layer = BACKGROUND_TILES_GROUND;
 
             e.pos.x = x ; // just texture for now
             e.pos.y = y ; // just texture for now
+        }
+    }
+
+    // set walls
+    for (int x = 0; x < map.w; ++x) {
+        auto e_ref = game_data.entities.add(Type::Tile);
+        auto &e = game_data.entities.get(e_ref);
+        e.sprite.textureAsset = &context.asset_manager.world;
+        e.sprite.textureIndex = 0;
+        e.sprite.layer = BACKGROUND_TILES_WALL;
+
+        e.pos.x = x;
+        e.pos.y = 0;
+
+        {
+            auto e_ref = game_data.entities.add(Type::Tile);
+            auto &e = game_data.entities.get(e_ref);
+            e.sprite.textureAsset = &context.asset_manager.world;
+            e.sprite.textureIndex = 0;
+            e.sprite.layer = BACKGROUND_TILES_WALL;
+
+            e.pos.x = x;
+            e.pos.y = map.h-1;
+        }
+    }
+
+    for (int y = 0; y < map.h-1; ++y) {
+        auto e_ref = game_data.entities.add(Type::Tile);
+        auto &e = game_data.entities.get(e_ref);
+        e.sprite.textureAsset = &context.asset_manager.world;
+        e.sprite.textureIndex = 6;
+        e.sprite.layer = BACKGROUND_TILES_WALL;
+
+        e.pos.x = 0;
+        e.pos.y = y;
+
+        {
+            auto e_ref = game_data.entities.add(Type::Tile);
+            auto &e = game_data.entities.get(e_ref);
+            e.sprite.textureAsset = &context.asset_manager.world;
+            e.sprite.textureIndex = 6;
+            e.sprite.layer = BACKGROUND_TILES_WALL;
+
+            e.pos.x = map.w-1;
+            e.pos.y = y;
         }
     }
 
@@ -41,8 +87,25 @@ void GamePlayScene::init(GameContext &context)
 
 void GamePlayScene::update(float deltaTime, GameContext &context)
 {
+    GameData &game_data = context.game_data;
+
+    // update block position
+    // block position
+    Vector2 world_pos = GetScreenToWorld2D(GetMousePosition(),game_data.camera);
+    game_data.mouse_world_pos = world_pos;
+    game_data.mouse_block_pos.x = (int)floor(world_pos.x);
+    game_data.mouse_block_pos.y = (int)floor(world_pos.y);
 
 
+    // toggle editor
+    if(IsKeyPressed(KEY_F10)){
+        game_data.editor_mode = !game_data.editor_mode;
+    }
+
+    // imgui editor
+    if(game_data.editor_mode){
+        Editor::processEditor(game_data);
+    }
 }
 
 void GamePlayScene::render(float deltaTime, GameContext &context)
@@ -53,17 +116,18 @@ void GamePlayScene::render(float deltaTime, GameContext &context)
     GameData &game_data = context.game_data;
     EntityArray &e_array = game_data.entities;
 
-    for (int i = 1; i < e_array.get_count(); ++i) { // awalys start with 1
-        Entity &e = e_array.entities[i];
-        if(!e) continue;
-        DrawTexturePro(
-                    e.sprite.textureAsset->texture, // texture
-                    getSourceRectangleByIndex(e.sprite.textureIndex,*e.sprite.textureAsset),
-                    {e.pos.x,e.pos.y, 1,1}, // destination
-                    {0,0}, // origin (top-left corner)
-                    0.f, // rotation
-                    WHITE // tint
-                    );
+
+    // render system
+    Systems::render_system(game_data);
+
+
+    // imgui editor
+    if(game_data.editor_mode){
+        Editor::drawGUI(game_data,context.asset_manager);
+
+        // draw mouse block position
+        Rectangle rect = {game_data.mouse_block_pos.x, game_data.mouse_block_pos.y,1,1};
+        DrawRectangleLinesEx(rect,0.05f,RED);
     }
 
     EndMode2D();

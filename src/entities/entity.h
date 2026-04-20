@@ -17,9 +17,7 @@ enum class Type{
     Enemy,
     Weapon,
     Item,
-    MapTileGround,
-    MapTileSolid,
-    MapTileVisual,
+    Tile,
 };
 
 // // Fixed size NOT DYNAMIC!

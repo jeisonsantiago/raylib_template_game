@@ -7,6 +7,7 @@ struct EntityArray{
     Entity entities[MAX_ENTITIES];
     bool used[MAX_ENTITIES]; // to keep track of used slots inside entities
     int gen[MAX_ENTITIES]; // to keep track of used slots inside entities
+
     int count = 0;
 
     int next_empty_slot = 1; // since 0 is the (NIL) INVALID slot
@@ -41,12 +42,8 @@ struct EntityArray{
     }
 
     Entity &get(EntityRef ref){
-
         int idx = deref(ref);
-        if(idx) return entities[idx];
-
-        memset(&entities[0],0,sizeof(Entity));
-        return entities[0];
+        return entities[idx];
     }
 
 private:

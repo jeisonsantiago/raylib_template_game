@@ -41,6 +41,8 @@ add_executable(RAYLIB_TEMPLATE_GAME
     src/scenes/game_play_scene.h src/scenes/game_play_scene.cpp
     src/scenes/main_menu_scene.h src/scenes/main_menu_scene.cpp
     src/game_context.cpp
+    src/editor.h src/editor.cpp
+    src/systems/render_system.h src/systems/render_system.cpp
 
 
 )
