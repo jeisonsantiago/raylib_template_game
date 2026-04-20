@@ -1,0 +1,48 @@
+#ifndef ENTITY
+#define ENTITY
+
+
+#include "components.h"
+
+struct EntityRef{
+    int idx;
+    int gen;
+
+    static EntityRef nil(){return EntityRef{0,0};};
+};
+
+enum class Type{
+    Nil,
+    Player,
+    Enemy,
+    Weapon,
+    Item,
+    MapTileGround,
+    MapTileSolid,
+    MapTileVisual,
+};
+
+// // Fixed size NOT DYNAMIC!
+struct Entity{
+    Type kind  = Type::Nil;
+    Vector2 pos;
+
+    ColliderComponent collider;
+    SpriteComponent sprite;
+
+    // int parent_idx;
+    // int first_item; // the first item that the entity owns
+    // int next_item; // the sibling item to ourselves
+
+    EntityRef parent_idx;
+    EntityRef first_child_idx;
+    EntityRef next_sibling_idx;
+    EntityRef previous_sibling_idx;
+
+    operator bool() const{
+        return kind != Type::Nil;
+    }
+};
+
+
+#endif //
