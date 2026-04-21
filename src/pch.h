@@ -17,6 +17,7 @@
 #include "raymath.h"
 
 #include "globals.h"
+#include "helpers.h"
 
 #include "imgui.h"
 #include "imgui_impl_raylib.h"

@@ -9,6 +9,8 @@ struct EntityRef{
     int gen;
 
     static EntityRef nil(){return EntityRef{0,0};};
+
+    bool is_nil(){return idx == 0 && gen == 0;};
 };
 
 enum class Type{

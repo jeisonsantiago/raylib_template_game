@@ -4,7 +4,8 @@
 struct GameData;
 
 namespace Systems {
-void render_system(GameData &game_data);
+void render_entities(GameData &game_data);
+void render_debug(GameData &game_data);
 }
 
 #endif //

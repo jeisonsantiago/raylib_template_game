@@ -2,7 +2,7 @@
 // #include "SaveLoadMap.h"
 #include "game_data.h"
 
-void Editor::drawGUI(GameData &game_data, AssetManager& assetManager)
+void Editor::drawGUI(GameData &game_data, AssetManager& asset_manager)
 {
     // GameData &gameData = gameState.gameScene.gameData;
 
@@ -26,7 +26,14 @@ void Editor::drawGUI(GameData &game_data, AssetManager& assetManager)
     ImGui::Text("Map Layer:");
     ImGui::SameLine();
 
-    const char* items[] = { "LAYER_GROUND", "LAYER_SOLID", "LAYER_VISUALS"};
+    //
+    const char* items[] = {"BACKGROUND_TILES_GROUND","BACKGROUND_TILES_SOLID","BACKGROUND_DECORATIONS"};
+    const int layer_index[] = {
+        Helpers::render_layer_index(RenderLayer::BACKGROUND_TILES_GROUND),
+        Helpers::render_layer_index(RenderLayer::BACKGROUND_TILES_SOLID),
+        Helpers::render_layer_index(RenderLayer::BACKGROUND_DECORATIONS)};
+
+    // const char* items[] = { "LAYER_GROUND", "LAYER_SOLID", "LAYER_VISUALS"};
     static const char* currentItem = nullptr;
     // gameData.mapLayerSelected = -1;
     if (ImGui::BeginCombo("##combo", currentItem)) {
@@ -34,7 +41,8 @@ void Editor::drawGUI(GameData &game_data, AssetManager& assetManager)
             bool isSelected = (currentItem == items[n]);
             if (ImGui::Selectable(items[n], isSelected)) {
                 currentItem = items[n];
-                // game_data.mapLayerSelected = n;
+                game_data.map_layer_selected = layer_index[n];
+                TraceLog(LOG_INFO,"CURRENT LAYER:%i",game_data.map_layer_selected);
             }
             if (isSelected) {
                 ImGui::SetItemDefaultFocus();
@@ -44,29 +52,30 @@ void Editor::drawGUI(GameData &game_data, AssetManager& assetManager)
         ImGui::EndCombo();
     }
 
-    // if(game_data.mapLayerSelected != -1){
-    //     size_t numberOfTiles = assetManager.world.tileCount;
+    if(game_data.map_layer_selected != -1){
+        size_t numberOfTiles = asset_manager.world.tileCount;
 
-    //     for (int i = 0; i < numberOfTiles; i++) {
-    //         auto atlas = getSourceRectangleByIndex(i,assetManager.world);
-    //         atlas.x /= assetManager.world.texture.width;
-    //         atlas.width /= assetManager.world.texture.width;
-    //         atlas.y /= assetManager.world.texture.height;
-    //         atlas.height /= assetManager.world.texture.height;
+        for (int i = 0; i < numberOfTiles; i++) {
+            auto atlas = getSourceRectangleByIndex(i,asset_manager.world);
+            atlas.x /= asset_manager.world.texture.width;
+            atlas.width /= asset_manager.world.texture.width;
+            atlas.y /= asset_manager.world.texture.height;
+            atlas.height /= asset_manager.world.texture.height;
 
-    //         ImGui::PushID(i);
-    //         ImTextureID tex = (ImTextureID)(intptr_t)assetManager.world.texture.id;
-    //         if(ImGui::ImageButton(tex,{32,32},{atlas.x, atlas.y},{atlas.x + atlas.width,atlas.y + atlas.height}))
-    //         {
-    //             game_data.creativeSelectedBlock = i;
-    //         }
-    //         ImGui::PopID();
+            ImGui::PushID(i);
+            ImTextureID tex = (ImTextureID)(intptr_t)asset_manager.world.texture.id;
+            if(ImGui::ImageButton(tex,{32,32},{atlas.x, atlas.y},{atlas.x + atlas.width,atlas.y + atlas.height}))
+            {
+                game_data.selected_block = i;
+                TraceLog(LOG_INFO,"selected:%i",game_data.selected_block);
+            }
+            ImGui::PopID();
 
-    //         if((i+1) % 16 != 0){
-    //             ImGui::SameLine();
-    //         }
-    //     }
-    // }
+            if((i+1) % 16 != 0){
+                ImGui::SameLine();
+            }
+        }
+    }
 
     // ImGui::Separator();
     // // save and load map
@@ -92,13 +101,28 @@ void Editor::drawGUI(GameData &game_data, AssetManager& assetManager)
 
     ImGui::End();
 
+
+    // // if on edit mode draw editable block
+    if(game_data.editor_mode){
+
+        if(game_data.selected_block != -1){
+            DrawTexturePro(
+                        asset_manager.world.texture, // texture
+                        getSourceRectangleByIndex(game_data.selected_block,asset_manager.interface),
+                        {game_data.mouse_block_pos.x, game_data.mouse_block_pos.y, 1,1}, // destination
+                        {0,0}, // origin (top-left corner)
+                        0.f, // rotation
+                        WHITE // tint
+                        );
+        }
+    }
+
     // draw map lines
     Rectangle mapRect = {0,0,(float)game_data.game_map.w,(float)game_data.game_map.h};
     DrawRectangleLinesEx(mapRect,0.05,GREEN);
 }
 
-void Editor::processEditor(GameData &game_data)
-{
+void Editor::processEditor(GameData &game_data, AssetManager& asset_manager){
 
     // GameData &gameData = gameState.gameScene.gameData;
 
@@ -112,15 +136,40 @@ void Editor::processEditor(GameData &game_data)
         int x = (int)game_data.mouse_block_pos.x;
         int y = (int)game_data.mouse_block_pos.y;
 
-        int mapLayerSelected = game_data.map_layer_selected;
+        // int mapLayerSelected = game_data.map_layer_selected;
 
         // Block *b = gameData.game_map.getBlockSafe(x,y,mapLayerSelected);
+        EntityRef e_ref = game_data.game_map.getBlock(x,y,game_data.map_layer_selected);
 
-        // if(b){
-        //     int textureIndex = gameData.creativeSelectedBlock;
-        //     b->textureIndex = textureIndex;
-        //     b->type = mapLayerSelected;
-        // }
+        // map slot is empty
+        if(e_ref.is_nil()) {
+            auto e_ref = game_data.entities.add(Type::Tile);
+            auto &e = game_data.entities.get(e_ref);
+            e.sprite.textureAsset = &asset_manager.world;
+            e.sprite.textureIndex = game_data.selected_block;
+
+            if(game_data.map_layer_selected == Helpers::render_layer_index(RenderLayer::BACKGROUND_TILES_SOLID)){
+                e.collider.h = 1;
+                e.collider.w = 1;
+                e.collider.active = true;
+            }
+
+            e.pos.x = x ;
+            e.pos.y = y ;
+
+            e.sprite.layer = static_cast<RenderLayer>(game_data.map_layer_selected);
+
+            game_data.game_map.setBlock(
+                        e.pos.x,
+                        e.pos.y,
+                        Helpers::render_layer_index(e.sprite.layer),e_ref);
+
+        }else{ // if exists and we only want to replace the sprite (fast and easy)
+            auto &entity = game_data.entities.get(e_ref);
+            entity.sprite.textureIndex = game_data.selected_block;
+            // if(entity != )
+            TraceLog(LOG_INFO,"e:%i",entity.sprite.layer);
+        }
     }
 
     // remove block in the map
@@ -137,3 +186,4 @@ void Editor::processEditor(GameData &game_data)
         // }
     }
 }
+

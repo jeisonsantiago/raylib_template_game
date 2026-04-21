@@ -43,6 +43,7 @@ add_executable(RAYLIB_TEMPLATE_GAME
     src/game_context.cpp
     src/editor.h src/editor.cpp
     src/systems/render_system.h src/systems/render_system.cpp
+    src/helpers.h src/helpers.cpp
 
 
 )

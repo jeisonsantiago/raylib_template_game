@@ -3,6 +3,7 @@
 // row    = index / width
 // column = index % width
 // index = (row * width) + column
+// #include "asset_manager.h"
 
 #include "game_context.h"
 #include "editor.h"
@@ -26,10 +27,12 @@ void GamePlayScene::init(GameContext &context)
             auto &e = game_data.entities.get(e_ref);
             e.sprite.textureAsset = &context.asset_manager.world;
             e.sprite.textureIndex = 103;
-            e.sprite.layer = BACKGROUND_TILES_GROUND;
+            e.sprite.layer = RenderLayer::BACKGROUND_TILES_GROUND;
 
             e.pos.x = x ; // just texture for now
             e.pos.y = y ; // just texture for now
+
+            map.setBlock(e.pos.x,e.pos.y,Helpers::render_layer_index(RenderLayer::BACKGROUND_TILES_GROUND),e_ref);
         }
     }
 
@@ -39,20 +42,31 @@ void GamePlayScene::init(GameContext &context)
         auto &e = game_data.entities.get(e_ref);
         e.sprite.textureAsset = &context.asset_manager.world;
         e.sprite.textureIndex = 0;
-        e.sprite.layer = BACKGROUND_TILES_WALL;
+        e.sprite.layer = RenderLayer::BACKGROUND_TILES_SOLID;
+
+        e.collider.h = 1;
+        e.collider.w = 1;
+        e.collider.active = true;
 
         e.pos.x = x;
         e.pos.y = 0;
 
+        map.setBlock(e.pos.x,e.pos.y,Helpers::render_layer_index(RenderLayer::BACKGROUND_TILES_SOLID),e_ref);
         {
             auto e_ref = game_data.entities.add(Type::Tile);
             auto &e = game_data.entities.get(e_ref);
             e.sprite.textureAsset = &context.asset_manager.world;
             e.sprite.textureIndex = 0;
-            e.sprite.layer = BACKGROUND_TILES_WALL;
+            e.sprite.layer = RenderLayer::BACKGROUND_TILES_SOLID;
+
+            e.collider.h = 1;
+            e.collider.w = 1;
+            e.collider.active = true;
 
             e.pos.x = x;
             e.pos.y = map.h-1;
+
+            map.setBlock(e.pos.x,e.pos.y,Helpers::render_layer_index(RenderLayer::BACKGROUND_TILES_SOLID),e_ref);
         }
     }
 
@@ -61,23 +75,33 @@ void GamePlayScene::init(GameContext &context)
         auto &e = game_data.entities.get(e_ref);
         e.sprite.textureAsset = &context.asset_manager.world;
         e.sprite.textureIndex = 6;
-        e.sprite.layer = BACKGROUND_TILES_WALL;
+        e.sprite.layer = RenderLayer::BACKGROUND_TILES_SOLID;
+
+        e.collider.h = 1;
+        e.collider.w = 1;
+        e.collider.active = true;
 
         e.pos.x = 0;
         e.pos.y = y;
 
+        map.setBlock(e.pos.x,e.pos.y,Helpers::render_layer_index(RenderLayer::BACKGROUND_TILES_SOLID),e_ref);
         {
             auto e_ref = game_data.entities.add(Type::Tile);
             auto &e = game_data.entities.get(e_ref);
             e.sprite.textureAsset = &context.asset_manager.world;
             e.sprite.textureIndex = 6;
-            e.sprite.layer = BACKGROUND_TILES_WALL;
+            e.sprite.layer = RenderLayer::BACKGROUND_TILES_SOLID;
+
+            e.collider.h = 1;
+            e.collider.w = 1;
+            e.collider.active = true;
 
             e.pos.x = map.w-1;
             e.pos.y = y;
+
+            map.setBlock(e.pos.x,e.pos.y,Helpers::render_layer_index(RenderLayer::BACKGROUND_TILES_SOLID),e_ref);
         }
     }
-
 
     game_data.camera.target = {0,0};
     game_data.camera.rotation = 0.0f;
@@ -104,7 +128,7 @@ void GamePlayScene::update(float deltaTime, GameContext &context)
 
     // imgui editor
     if(game_data.editor_mode){
-        Editor::processEditor(game_data);
+        Editor::processEditor(game_data,context.asset_manager);
     }
 }
 
@@ -118,7 +142,8 @@ void GamePlayScene::render(float deltaTime, GameContext &context)
 
 
     // render system
-    Systems::render_system(game_data);
+    Systems::render_entities(game_data);
+    Systems::render_debug(game_data);
 
 
     // imgui editor
