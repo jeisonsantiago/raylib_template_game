@@ -22,6 +22,13 @@ struct SpriteComponent{
     RenderLayer layer = RenderLayer::DEFAULT;
 };
 
+struct PhysicsComponent{
+    Vector2 velocity = {};
+    Vector2 acceleration = {};
+    float maxSpeed = 0;
+    float moveForce = 0;
+};
+
 struct HealthComponent{
     float max_health;
     float current_health;

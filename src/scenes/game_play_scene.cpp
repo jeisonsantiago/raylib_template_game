@@ -10,7 +10,7 @@
 
 #include "systems/render_system.h"
 
-#include "factories/create_player.h"
+#include "factories/player.h"
 
 void GamePlayScene::init(GameContext &context)
 {
@@ -106,7 +106,7 @@ void GamePlayScene::init(GameContext &context)
     }
 
     // create player
-    create_player(Vector2{2,2},game_data,context.asset_manager);
+    Player::create(Vector2{2,2},game_data,context.asset_manager);
 
     TraceLog(LOG_INFO, "Entity size: %zu bytes", sizeof(Entity));
 
@@ -128,6 +128,7 @@ void GamePlayScene::update(float deltaTime, GameContext &context)
     game_data.mouse_block_pos.x = (int)floor(world_pos.x);
     game_data.mouse_block_pos.y = (int)floor(world_pos.y);
 
+    // update entities
 
     // toggle editor
     if(IsKeyPressed(KEY_F10)){

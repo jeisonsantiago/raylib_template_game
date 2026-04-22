@@ -1,8 +1,11 @@
-#include "create_player.h"
+#include "player.h"
 
-#include "game_context.h"
+#include "game_data.h"
 
-void create_player(Vector2 position, GameData &game_data, AssetManager &asset_manager)
+namespace Player {
+
+
+void create(Vector2 position, GameData &game_data, AssetManager &asset_manager)
 {
     auto e_ref = game_data.entities.add(Type::Player);
     auto &e = game_data.entities.get(e_ref);
@@ -15,4 +18,11 @@ void create_player(Vector2 position, GameData &game_data, AssetManager &asset_ma
     e.collider.active = true;
 
     e.pos = position;
+}
+
+void update(EntityRef e_ref, float delta_time, GameData &game_data)
+{
+
+}
+
 }

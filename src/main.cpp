@@ -39,7 +39,6 @@ int main()
 
     // gameState->assetManager.loadAll();
     GameContext *game_context = new GameContext();
-
     GamePlayScene game_play; // can be in teh stack since it's just functions
 
     // init
