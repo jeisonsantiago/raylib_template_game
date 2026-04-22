@@ -145,8 +145,8 @@ void Editor::processEditor(GameData &game_data, AssetManager& asset_manager){
         if(e_ref.is_nil()) {
             auto e_ref = game_data.entities.add(Type::Tile);
             auto &e = game_data.entities.get(e_ref);
-            e.sprite.textureAsset = &asset_manager.world;
-            e.sprite.textureIndex = game_data.selected_block;
+            e.sprite.texture_asset = &asset_manager.world;
+            e.sprite.texture_index = game_data.selected_block;
 
             if(game_data.map_layer_selected == Helpers::render_layer_index(RenderLayer::BACKGROUND_TILES_SOLID)){
                 e.collider.h = 1;
@@ -166,7 +166,7 @@ void Editor::processEditor(GameData &game_data, AssetManager& asset_manager){
 
         }else{ // if exists and we only want to replace the sprite (fast and easy)
             auto &entity = game_data.entities.get(e_ref);
-            entity.sprite.textureIndex = game_data.selected_block;
+            entity.sprite.texture_index = game_data.selected_block;
             // if(entity != )
             TraceLog(LOG_INFO,"e:%i",entity.sprite.layer);
         }

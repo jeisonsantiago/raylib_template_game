@@ -10,6 +10,8 @@
 
 #include "systems/render_system.h"
 
+#include "factories/create_player.h"
+
 void GamePlayScene::init(GameContext &context)
 {
     GameData &game_data = context.game_data;
@@ -25,8 +27,8 @@ void GamePlayScene::init(GameContext &context)
             // create entity
             auto e_ref = game_data.entities.add(Type::Tile);
             auto &e = game_data.entities.get(e_ref);
-            e.sprite.textureAsset = &context.asset_manager.world;
-            e.sprite.textureIndex = 103;
+            e.sprite.texture_asset = &context.asset_manager.world;
+            e.sprite.texture_index = 103;
             e.sprite.layer = RenderLayer::BACKGROUND_TILES_GROUND;
 
             e.pos.x = x ; // just texture for now
@@ -40,8 +42,8 @@ void GamePlayScene::init(GameContext &context)
     for (int x = 0; x < map.w; ++x) {
         auto e_ref = game_data.entities.add(Type::Tile);
         auto &e = game_data.entities.get(e_ref);
-        e.sprite.textureAsset = &context.asset_manager.world;
-        e.sprite.textureIndex = 0;
+        e.sprite.texture_asset = &context.asset_manager.world;
+        e.sprite.texture_index = 0;
         e.sprite.layer = RenderLayer::BACKGROUND_TILES_SOLID;
 
         e.collider.h = 1;
@@ -55,8 +57,8 @@ void GamePlayScene::init(GameContext &context)
         {
             auto e_ref = game_data.entities.add(Type::Tile);
             auto &e = game_data.entities.get(e_ref);
-            e.sprite.textureAsset = &context.asset_manager.world;
-            e.sprite.textureIndex = 0;
+            e.sprite.texture_asset = &context.asset_manager.world;
+            e.sprite.texture_index = 0;
             e.sprite.layer = RenderLayer::BACKGROUND_TILES_SOLID;
 
             e.collider.h = 1;
@@ -73,8 +75,8 @@ void GamePlayScene::init(GameContext &context)
     for (int y = 0; y < map.h-1; ++y) {
         auto e_ref = game_data.entities.add(Type::Tile);
         auto &e = game_data.entities.get(e_ref);
-        e.sprite.textureAsset = &context.asset_manager.world;
-        e.sprite.textureIndex = 6;
+        e.sprite.texture_asset = &context.asset_manager.world;
+        e.sprite.texture_index = 6;
         e.sprite.layer = RenderLayer::BACKGROUND_TILES_SOLID;
 
         e.collider.h = 1;
@@ -88,8 +90,8 @@ void GamePlayScene::init(GameContext &context)
         {
             auto e_ref = game_data.entities.add(Type::Tile);
             auto &e = game_data.entities.get(e_ref);
-            e.sprite.textureAsset = &context.asset_manager.world;
-            e.sprite.textureIndex = 6;
+            e.sprite.texture_asset = &context.asset_manager.world;
+            e.sprite.texture_index = 6;
             e.sprite.layer = RenderLayer::BACKGROUND_TILES_SOLID;
 
             e.collider.h = 1;
@@ -103,6 +105,12 @@ void GamePlayScene::init(GameContext &context)
         }
     }
 
+    // create player
+    create_player(Vector2{2,2},game_data,context.asset_manager);
+
+    TraceLog(LOG_INFO, "Entity size: %zu bytes", sizeof(Entity));
+
+    // set camera
     game_data.camera.target = {0,0};
     game_data.camera.rotation = 0.0f;
     game_data.camera.zoom = 50.0f;

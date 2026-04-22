@@ -4,6 +4,8 @@
 
 #include "components.h"
 
+struct EntityArray;
+
 struct EntityRef{
     int idx;
     int gen;
@@ -27,8 +29,11 @@ struct Entity{
     Type kind  = Type::Nil;
     Vector2 pos;
 
+    // components
     ColliderComponent collider;
     SpriteComponent sprite;
+    HealthComponent health;
+    AttackComponent attack;
 
     // int parent_idx;
     // int first_item; // the first item that the entity owns
@@ -38,6 +43,11 @@ struct Entity{
     EntityRef first_child_idx;
     EntityRef next_sibling_idx;
     EntityRef previous_sibling_idx;
+
+    // collision related
+    std::function<void(std::uint64_t,std::uint64_t, EntityArray&)> onCollisionEnter = nullptr;
+    std::function<void(std::uint64_t,std::uint64_t, EntityArray&)> onCollisionStay = nullptr;
+    std::function<void(std::uint64_t,std::uint64_t, EntityArray&)> onCollisionExit = nullptr;
 
     operator bool() const{
         return kind != Type::Nil;

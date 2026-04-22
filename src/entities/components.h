@@ -16,10 +16,22 @@ struct ColliderComponent{
 };
 
 struct SpriteComponent{
-    TextureAsset *textureAsset = nullptr;
-    int textureIndex;
-    Vector2 renderOrigin = {0};
+    TextureAsset *texture_asset = nullptr;
+    int texture_index;
+    Vector2 render_origin = {0};
     RenderLayer layer = RenderLayer::DEFAULT;
 };
+
+struct HealthComponent{
+    float max_health;
+    float current_health;
+};
+
+struct AttackComponent{
+    float cooldown = 1.0f; // 1 attack per second
+    float cooldown_counter = 0.0f;
+};
+
+
 
 #endif //

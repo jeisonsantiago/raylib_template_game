@@ -24,8 +24,8 @@ void render_entities(GameData &game_data){
         for (int &idx : layer_items) {
             Entity &e = e_array.entities[idx];
             DrawTexturePro(
-                        e.sprite.textureAsset->texture, // texture
-                        getSourceRectangleByIndex(e.sprite.textureIndex,*e.sprite.textureAsset),
+                        e.sprite.texture_asset->texture, // texture
+                        getSourceRectangleByIndex(e.sprite.texture_index,*e.sprite.texture_asset),
                         {e.pos.x,e.pos.y, 1,1}, // destination
                         {0,0}, // origin (top-left corner)
                         0.f, // rotation
