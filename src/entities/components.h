@@ -10,8 +10,8 @@ struct TransformComponent{
 
 struct ColliderComponent{
     bool active = false;
-    float w;
-    float h;
+    float width;
+    float height;
     Vector2 offset;
 };
 
@@ -25,8 +25,8 @@ struct SpriteComponent{
 struct PhysicsComponent{
     Vector2 velocity = {};
     Vector2 acceleration = {};
-    float maxSpeed = 0;
-    float moveForce = 0;
+    float max_speed = 0;
+    float move_force = 0;
 };
 
 struct HealthComponent{

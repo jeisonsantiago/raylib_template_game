@@ -137,20 +137,21 @@ void Editor::processEditor(GameData &game_data, AssetManager& asset_manager){
         int y = (int)game_data.mouse_block_pos.y;
 
         // int mapLayerSelected = game_data.map_layer_selected;
+        if(game_data.map_layer_selected == -1) return;
 
         // Block *b = gameData.game_map.getBlockSafe(x,y,mapLayerSelected);
         EntityRef e_ref = game_data.game_map.getBlock(x,y,game_data.map_layer_selected);
 
         // map slot is empty
         if(e_ref.is_nil()) {
-            auto e_ref = game_data.entities.add(Type::Tile);
+            auto e_ref = game_data.entities.add(Kind::Tile);
             auto &e = game_data.entities.get(e_ref);
             e.sprite.texture_asset = &asset_manager.world;
             e.sprite.texture_index = game_data.selected_block;
 
             if(game_data.map_layer_selected == Helpers::render_layer_index(RenderLayer::BACKGROUND_TILES_SOLID)){
-                e.collider.h = 1;
-                e.collider.w = 1;
+                e.collider.height = 1;
+                e.collider.width = 1;
                 e.collider.active = true;
             }
 

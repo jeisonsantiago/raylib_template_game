@@ -44,7 +44,13 @@ struct GameData{
     EntityArray entities;
 
     // render bucket
-    std::vector<int> render_bucket[static_cast<int>(RenderLayer::MAX_LAYERS)];
+    // std::vector<int> render_bucket[static_cast<int>(RenderLayer::MAX_LAYERS)];
+    int render_bucket[static_cast<int>(RenderLayer::MAX_LAYERS)][MAX_ENTITIES];
+    int render_bucket_count[static_cast<int>(RenderLayer::MAX_LAYERS)] = {};
+
+    int solid_tiles[MAX_ENTITIES];
+    int solid_tiles_count;
+
 
     // std::vector<std::uint64_t> toRemoveEntities;
     // std::vector<std::unique_ptr<UIElement>> uiElements;

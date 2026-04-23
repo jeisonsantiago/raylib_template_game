@@ -3,14 +3,16 @@
 // row    = index / width
 // column = index % width
 // index = (row * width) + column
-// #include "asset_manager.h"
+// #include "asset_manager.height"
 
 #include "game_context.h"
 #include "editor.h"
 
-#include "systems/render_system.h"
-
 #include "factories/player.h"
+
+#include "systems/render_system.h"
+#include "systems/behavior_system.h"
+#include "systems/physics_system.h"
 
 void GamePlayScene::init(GameContext &context)
 {
@@ -25,7 +27,7 @@ void GamePlayScene::init(GameContext &context)
             int index = (y * map.w) + x;
 
             // create entity
-            auto e_ref = game_data.entities.add(Type::Tile);
+            auto e_ref = game_data.entities.add(Kind::Tile);
             auto &e = game_data.entities.get(e_ref);
             e.sprite.texture_asset = &context.asset_manager.world;
             e.sprite.texture_index = 103;
@@ -40,14 +42,14 @@ void GamePlayScene::init(GameContext &context)
 
     // set walls
     for (int x = 0; x < map.w; ++x) {
-        auto e_ref = game_data.entities.add(Type::Tile);
+        auto e_ref = game_data.entities.add(Kind::Tile);
         auto &e = game_data.entities.get(e_ref);
         e.sprite.texture_asset = &context.asset_manager.world;
         e.sprite.texture_index = 0;
         e.sprite.layer = RenderLayer::BACKGROUND_TILES_SOLID;
 
-        e.collider.h = 1;
-        e.collider.w = 1;
+        e.collider.height = 1;
+        e.collider.width = 1;
         e.collider.active = true;
 
         e.pos.x = x;
@@ -55,14 +57,14 @@ void GamePlayScene::init(GameContext &context)
 
         map.setBlock(e.pos.x,e.pos.y,Helpers::render_layer_index(RenderLayer::BACKGROUND_TILES_SOLID),e_ref);
         {
-            auto e_ref = game_data.entities.add(Type::Tile);
+            auto e_ref = game_data.entities.add(Kind::Tile);
             auto &e = game_data.entities.get(e_ref);
             e.sprite.texture_asset = &context.asset_manager.world;
             e.sprite.texture_index = 0;
             e.sprite.layer = RenderLayer::BACKGROUND_TILES_SOLID;
 
-            e.collider.h = 1;
-            e.collider.w = 1;
+            e.collider.height = 1;
+            e.collider.width = 1;
             e.collider.active = true;
 
             e.pos.x = x;
@@ -73,14 +75,14 @@ void GamePlayScene::init(GameContext &context)
     }
 
     for (int y = 0; y < map.h-1; ++y) {
-        auto e_ref = game_data.entities.add(Type::Tile);
+        auto e_ref = game_data.entities.add(Kind::Tile);
         auto &e = game_data.entities.get(e_ref);
         e.sprite.texture_asset = &context.asset_manager.world;
         e.sprite.texture_index = 6;
         e.sprite.layer = RenderLayer::BACKGROUND_TILES_SOLID;
 
-        e.collider.h = 1;
-        e.collider.w = 1;
+        e.collider.height = 1;
+        e.collider.width = 1;
         e.collider.active = true;
 
         e.pos.x = 0;
@@ -88,14 +90,14 @@ void GamePlayScene::init(GameContext &context)
 
         map.setBlock(e.pos.x,e.pos.y,Helpers::render_layer_index(RenderLayer::BACKGROUND_TILES_SOLID),e_ref);
         {
-            auto e_ref = game_data.entities.add(Type::Tile);
+            auto e_ref = game_data.entities.add(Kind::Tile);
             auto &e = game_data.entities.get(e_ref);
             e.sprite.texture_asset = &context.asset_manager.world;
             e.sprite.texture_index = 6;
             e.sprite.layer = RenderLayer::BACKGROUND_TILES_SOLID;
 
-            e.collider.h = 1;
-            e.collider.w = 1;
+            e.collider.height = 1;
+            e.collider.width = 1;
             e.collider.active = true;
 
             e.pos.x = map.w-1;
@@ -106,7 +108,7 @@ void GamePlayScene::init(GameContext &context)
     }
 
     // create player
-    Player::create(Vector2{2,2},game_data,context.asset_manager);
+    Player::create(Vector2{5,7},game_data,context.asset_manager);
 
     TraceLog(LOG_INFO, "Entity size: %zu bytes", sizeof(Entity));
 
@@ -115,9 +117,11 @@ void GamePlayScene::init(GameContext &context)
     game_data.camera.rotation = 0.0f;
     game_data.camera.zoom = 50.0f;
     game_data.camera.offset = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
+
+    Helpers::update_solid_tiles(game_data);
 }
 
-void GamePlayScene::update(float deltaTime, GameContext &context)
+void GamePlayScene::update(float delta_time, GameContext &context)
 {
     GameData &game_data = context.game_data;
 
@@ -129,6 +133,8 @@ void GamePlayScene::update(float deltaTime, GameContext &context)
     game_data.mouse_block_pos.y = (int)floor(world_pos.y);
 
     // update entities
+    Systems::behavior(delta_time,game_data);
+    Systems::physics(delta_time,game_data);
 
     // toggle editor
     if(IsKeyPressed(KEY_F10)){

@@ -8,7 +8,7 @@ struct EntityArray{
     bool used[MAX_ENTITIES]; // to keep track of used slots inside entities
     int gen[MAX_ENTITIES]; // to keep track of used slots inside entities
 
-    int count = 0;
+    int count = 1;
 
     int next_empty_slot = 1; // since 0 is the (NIL) INVALID slot
 
@@ -17,11 +17,11 @@ struct EntityArray{
     }
 
     int get_count(){
-        return (count+1);
+        return (count);
     }
 
     // return index from created entity
-    EntityRef add(Type kind){
+    EntityRef add(Kind kind){
         // entity_ref slot = {};
         int slot = find_empty();
         if(slot){
@@ -29,7 +29,7 @@ struct EntityArray{
             entities[slot].kind = kind;
             used[slot] = true;
             gen[slot] +=1;
-
+            count++;
             return {slot,gen[slot]};
 
         }
@@ -51,7 +51,6 @@ private:
     int find_empty(){
         for (int i = 1; i < MAX_ENTITIES; ++i) { // start with 1 since 0 is NIL
             if(!used[i]){
-                if(i > count) count = i;
                 return i; // return unused index
             }
         }

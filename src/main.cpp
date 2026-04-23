@@ -88,6 +88,8 @@ int main()
 
         rlImGuiEnd();
 
+        DrawFPS(10,10);
+
         EndDrawing();
     }
 

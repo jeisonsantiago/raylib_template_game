@@ -45,6 +45,8 @@ add_executable(RAYLIB_TEMPLATE_GAME
     src/systems/render_system.h src/systems/render_system.cpp
     src/helpers.h src/helpers.cpp
     src/factories/player.h src/factories/player.cpp
+    src/systems/behavior_system.h src/systems/behavior_system.cpp
+    src/systems/physics_system.h src/systems/physics_system.cpp
 
 
 )

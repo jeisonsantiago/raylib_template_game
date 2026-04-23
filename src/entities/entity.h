@@ -15,7 +15,7 @@ struct EntityRef{
     bool is_nil(){return idx == 0 && gen == 0;};
 };
 
-enum class Type{
+enum class Kind{
     Nil,
     Player,
     Enemy,
@@ -26,7 +26,7 @@ enum class Type{
 
 // // Fixed size NOT DYNAMIC!
 struct Entity{
-    Type kind  = Type::Nil;
+    Kind kind  = Kind::Nil;
     Vector2 pos;
 
     // components
@@ -34,6 +34,7 @@ struct Entity{
     SpriteComponent sprite;
     HealthComponent health;
     AttackComponent attack;
+    PhysicsComponent physics;
 
     // int parent_idx;
     // int first_item; // the first item that the entity owns
@@ -50,9 +51,16 @@ struct Entity{
     std::function<void(std::uint64_t,std::uint64_t, EntityArray&)> on_collision_exit = nullptr;
 
     operator bool() const{
-        return kind != Type::Nil;
+        return kind != Kind::Nil;
     }
 };
 
+
+namespace EntityHelpers {
+    // center of the entity return the center of the collider not the position of the entity
+    Vector2 center(Entity &e);
+    Vector2 top_left(Entity &e);
+    Rectangle rect(Entity &e);
+}
 
 #endif //
