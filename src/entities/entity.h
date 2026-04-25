@@ -20,6 +20,7 @@ enum class Kind{
     Player,
     Enemy,
     Weapon,
+    Particle,
     Item,
     Tile,
 };
@@ -46,13 +47,16 @@ struct Entity{
     EntityRef previous_sibling_idx;
 
     // collision related
-    std::function<void(std::uint64_t,std::uint64_t, EntityArray&)> on_collision_enter = nullptr;
-    std::function<void(std::uint64_t,std::uint64_t, EntityArray&)> on_collision_stay = nullptr;
-    std::function<void(std::uint64_t,std::uint64_t, EntityArray&)> on_collision_exit = nullptr;
+    std::function<void(int,int, EntityArray&)> on_collision_enter = nullptr;
+    std::function<void(int,int, EntityArray&)> on_collision_stay = nullptr;
+    std::function<void(int,int, EntityArray&)> on_collision_exit = nullptr;
 
     operator bool() const{
         return kind != Kind::Nil;
     }
+
+
+    // bool has_child(int idx);
 };
 
 

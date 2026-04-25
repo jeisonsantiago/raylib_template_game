@@ -9,6 +9,7 @@
 #include "editor.h"
 
 #include "factories/player.h"
+#include "factories/enemy.h"
 
 #include "systems/render_system.h"
 #include "systems/behavior_system.h"
@@ -110,6 +111,8 @@ void GamePlayScene::init(GameContext &context)
     // create player
     Player::create(Vector2{5,7},game_data,context.asset_manager);
 
+    Enemy::create(Vector2{4,4},game_data,context.asset_manager);
+
     TraceLog(LOG_INFO, "Entity size: %zu bytes", sizeof(Entity));
 
     // set camera
@@ -133,8 +136,9 @@ void GamePlayScene::update(float delta_time, GameContext &context)
     game_data.mouse_block_pos.y = (int)floor(world_pos.y);
 
     // update entities
-    Systems::behavior(delta_time,game_data);
+    Systems::behavior(delta_time,game_data, context.asset_manager);
     Systems::physics(delta_time,game_data);
+    Systems::physics_collision_calls(delta_time,game_data);
 
     // toggle editor
     if(IsKeyPressed(KEY_F10)){

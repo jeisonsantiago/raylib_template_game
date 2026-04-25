@@ -6,16 +6,17 @@ namespace Systems {
 
 void physics(float delta_time, GameData &game_data)
 {
-    float drag = 0.85f;
+    float drag = .95f;
     float speed = 0.0f;
 
     EntityArray &e_array = game_data.entities;
+
     for (int i = 1; i < e_array.get_count(); ++i) {
         if(!e_array.used[i]) continue;
 
         Entity &entity_a = e_array.entities[i];
 
-        if(entity_a.kind != Kind::Player) continue;
+        if(entity_a.kind == Kind::Tile || !entity_a.collider.active) continue;
 
         //--------------- X ---------------
         // apply acceleration
@@ -84,61 +85,82 @@ void physics(float delta_time, GameData &game_data)
                 }
             }
         }
-
-
     }
 }
 
+void physics_collision_calls(float delta_time, GameData &game_data){
 
-// void physics(float delta_time, GameData &game_data)
-// {
-//     float drag = 0.85f;
-//     float speed = 0.0f;
+    EntityArray &e_array = game_data.entities;
 
-//     EntityArray &e_array = game_data.entities;
-//     for (int i = 1; i < e_array.get_count(); ++i) {
-//         if(!e_array.used[i]) continue;
+    for (int i = 1; i < e_array.get_count(); ++i) {
+        if(!e_array.used[i]) continue;
+        Entity &e = e_array.entities[i];
+        if(e.kind == Kind::Tile || !e.collider.active) continue;
 
-//         Entity &e = e_array.entities[i];
+        e.collider.previous_collisions = e.collider.current_collisions;
+        e.collider.previous_collisions_count = e.collider.current_collisions_count;
 
-//         if(e.kind != Kind::Player) continue;
+        //clear current collisions
+        e.collider.current_collisions = {};
+        e.collider.current_collisions_count = 0;
+    }
 
-//         //--------------- X ---------------
-//         // apply acceleration
-//         e.physics.velocity.x += e.physics.acceleration.x * delta_time;
+    // CORRECT — only check each pair once
+    for(size_t i = 1; i < e_array.get_count(); i++){
+        if(!e_array.used[i]) continue;
+        Entity &e_a = e_array.entities[i];
+        if(e_a.kind == Kind::Tile || !e_a.collider.active) continue;
 
-//         //apply drag
-//         e.physics.velocity.x *= drag;
+        Rectangle rect_a = EntityHelpers::rect(e_a);
 
-//         // clamp to max speed
-//         speed = std::sqrt(e.physics.velocity.x * e.physics.velocity.x + e.physics.velocity.y * e.physics.velocity.y);
-//         if(speed > e.physics.max_speed){
-//             float scale = e.physics.max_speed / speed;
-//             e.physics.velocity.x *= scale;
-//         }
+        for(size_t j = i+1; j < e_array.get_count(); j++){
+            if(!e_array.used[j]) continue;
+            Entity &e_b = e_array.entities[j];
+            if(e_b.kind == Kind::Tile || !e_b.collider.active) continue;
 
-//         // integrate position
-//         e.pos.x += e.physics.velocity.x * delta_time;
+            Rectangle rect_b = EntityHelpers::rect(e_b);
+
+            if(!CheckCollisionRecs(rect_a, rect_b)) continue;
+
+            // //register contact
+            if(e_a.collider.current_collisions_count < 10) e_a.collider.current_collisions[e_a.collider.current_collisions_count++] = j;
+            if(e_b.collider.current_collisions_count < 10) e_b.collider.current_collisions[e_b.collider.current_collisions_count++] = i;
+        }
+    }
+
+    // fire events
+    for (int i = 1; i < e_array.get_count(); ++i) {
+        if(!e_array.used[i]) continue;
+        Entity &e = e_array.entities[i];
+        if(e.kind == Kind::Tile || !e.collider.active) continue;
+
+        for (int j = 0; j < e.collider.current_collisions_count; ++j) {
+            int other = e.collider.current_collisions[j];
+            if(!e.collider.was_colliding(other)){
+                // on collision enter, check if the function is nullptr before
+                if(e.on_collision_enter){
+                    e.on_collision_enter(i, other,game_data.entities);
+                }
+            }else{
+                // on collision stay, check if the function is nullptr before
+                if(e.on_collision_stay){
+                    e.on_collision_stay(i, other,game_data.entities);
+                }
+            }
+        }
+
+        for (int j = 0; j < e.collider.previous_collisions_count; ++j) {
+            int other = e.collider.previous_collisions[j];
+            if(!e.collider.is_colliding(other)){
+                // on collision exit, check if the function is nullptr before
+                if(e.on_collision_exit){
+                    e.on_collision_exit(i, other,game_data.entities);
+                }
+            }
+        }
+    }
 
 
-//         //--------------- Y ---------------
-//         // apply acceleration
-//         e.physics.velocity.y += e.physics.acceleration.y * delta_time;
-
-//         //apply drag
-//         e.physics.velocity.y *= drag;
-
-//         // clamp to max speed
-//         speed = std::sqrt(e.physics.velocity.x * e.physics.velocity.x + e.physics.velocity.y * e.physics.velocity.y);
-//         if(speed > e.physics.max_speed){
-//             float scale = e.physics.max_speed / speed;
-//             e.physics.velocity.y *= scale;
-//         }
-
-//         // integrate position
-//         e.pos.y += e.physics.velocity.y * delta_time;
-
-//     }
-// }
+}
 
 }

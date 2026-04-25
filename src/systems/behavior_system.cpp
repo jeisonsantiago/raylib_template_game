@@ -6,7 +6,7 @@
 
 namespace Systems {
 
-void behavior(float delta_time, GameData &game_data)
+void behavior(float delta_time, GameData &game_data, AssetManager &asset_manager)
 {
     EntityArray &e_array = game_data.entities;
 
@@ -17,7 +17,7 @@ void behavior(float delta_time, GameData &game_data)
 
         switch (e.kind) {
         case Kind::Player:
-            Player::update(e,delta_time,game_data);
+            Player::update(e,delta_time,game_data, asset_manager);
             break;
         case Kind::Enemy:
             break;

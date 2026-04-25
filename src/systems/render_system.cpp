@@ -29,7 +29,7 @@ void render_entities(GameData &game_data){
                         getSourceRectangleByIndex(e.sprite.texture_index,*e.sprite.texture_asset),
                         {e.pos.x,e.pos.y, 1,1}, // destination
                         e.sprite.render_origin, // origin (top-left corner)
-                        0.f, // rotation
+                        e.sprite.angle, // rotation
                         WHITE // tint
                         );
         }

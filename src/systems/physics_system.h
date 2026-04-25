@@ -5,6 +5,7 @@ struct GameData;
 
 namespace Systems {
     void physics(float delta_time, GameData &game_data);
+    void physics_collision_calls(float delta_time, GameData &game_data);
 }
 
 #endif //

@@ -1,4 +1,5 @@
 #include "entity.h"
+#include "entity_array.h"
 
 namespace EntityHelpers {
 
@@ -21,5 +22,6 @@ Rectangle rect(Entity &e)
     Vector2 res = e.pos + e.collider.offset;
     return Rectangle{res.x, res.y, e.collider.width, e.collider.height};
 }
-
 }
+
+
