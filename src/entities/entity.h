@@ -29,6 +29,8 @@ enum class Kind{
 struct Entity{
     Kind kind  = Kind::Nil;
     Vector2 pos;
+    bool active = true;
+    bool queue_free = false;
 
     // components
     ColliderComponent collider;
@@ -36,15 +38,16 @@ struct Entity{
     HealthComponent health;
     AttackComponent attack;
     PhysicsComponent physics;
+    AnimationComponent animation;
 
     // int parent_idx;
     // int first_item; // the first item that the entity owns
     // int next_item; // the sibling item to ourselves
 
-    EntityRef parent_idx;
-    EntityRef first_child_idx;
-    EntityRef next_sibling_idx;
-    EntityRef previous_sibling_idx;
+    EntityRef parent_ref;
+    EntityRef first_child_ref;
+    EntityRef next_sibling_ref;
+    EntityRef previous_sibling_ref;
 
     // collision related
     std::function<void(int,int, EntityArray&)> on_collision_enter = nullptr;

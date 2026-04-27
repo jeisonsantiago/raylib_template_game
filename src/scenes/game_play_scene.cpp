@@ -14,6 +14,8 @@
 #include "systems/render_system.h"
 #include "systems/behavior_system.h"
 #include "systems/physics_system.h"
+#include "systems/queue_free_system.h"
+#include "systems/animation_system.h"
 
 void GamePlayScene::init(GameContext &context)
 {
@@ -136,9 +138,16 @@ void GamePlayScene::update(float delta_time, GameContext &context)
     game_data.mouse_block_pos.y = (int)floor(world_pos.y);
 
     // update entities
+    Systems::animation(delta_time,game_data);
     Systems::behavior(delta_time,game_data, context.asset_manager);
     Systems::physics(delta_time,game_data);
-    Systems::physics_collision_calls(delta_time,game_data);
+
+    // physics update at 0.1 sec
+    game_data.collision_callback_update_count += delta_time;
+    if(game_data.collision_callback_update_count >= game_data.collision_callback_update){
+        Systems::physics_collision_calls(delta_time,game_data);
+        game_data.collision_callback_update_count = 0.0f;
+    }
 
     // toggle editor
     if(IsKeyPressed(KEY_F10)){
@@ -149,6 +158,8 @@ void GamePlayScene::update(float delta_time, GameContext &context)
     if(game_data.editor_mode){
         Editor::processEditor(game_data,context.asset_manager);
     }
+
+    Systems::queue_free(game_data);
 }
 
 void GamePlayScene::render(float deltaTime, GameContext &context)
@@ -159,11 +170,9 @@ void GamePlayScene::render(float deltaTime, GameContext &context)
     GameData &game_data = context.game_data;
     EntityArray &e_array = game_data.entities;
 
-
     // render system
     Systems::render_entities(game_data);
     Systems::render_debug(game_data);
-
 
     // imgui editor
     if(game_data.editor_mode){

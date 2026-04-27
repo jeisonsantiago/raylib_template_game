@@ -16,6 +16,9 @@ void physics(float delta_time, GameData &game_data)
 
         Entity &entity_a = e_array.entities[i];
 
+        if(!entity_a.active )continue;
+        if(entity_a.collider.is_trigger) continue;
+
         if(entity_a.kind == Kind::Tile || !entity_a.collider.active) continue;
 
         //--------------- X ---------------
@@ -95,7 +98,11 @@ void physics_collision_calls(float delta_time, GameData &game_data){
     for (int i = 1; i < e_array.get_count(); ++i) {
         if(!e_array.used[i]) continue;
         Entity &e = e_array.entities[i];
-        if(e.kind == Kind::Tile || !e.collider.active) continue;
+
+        // if(!e.active )continue;
+
+        // if(e.kind == Kind::Tile || !e.collider.active) continue;
+        if(e.kind == Kind::Tile) continue;
 
         e.collider.previous_collisions = e.collider.current_collisions;
         e.collider.previous_collisions_count = e.collider.current_collisions_count;

@@ -12,6 +12,7 @@ struct ColliderComponent{
     bool active = false;
     float width;
     float height;
+    bool is_trigger = false;
 
     Vector2 offset;
 
@@ -66,6 +67,33 @@ struct AttackComponent{
     float cooldown = 1.0f; // 1 attack per second
     float cooldown_counter = 0.0f;
 };
+
+struct AnimationComponent{
+    bool active = false;
+    int startFrame = {};
+    int lastFrame = {};
+    int currentFrame = {};
+    int frameOffset = {};
+    int frameCount = 2; // for now
+
+    // counter for any animation
+    float animationCounter = 0;
+
+    // specific animation type (loop)
+    float idleDuration = 0;// duration per frame
+    float runDuration = 0;
+
+    // sets for default animation
+    bool defaultAnimation = false;
+    float defaultDuration = 0;
+
+    // deactivate entity when animation is finished
+    bool deactivateOnFinish = false;
+
+    // queue free when animation is finished
+    bool deleteOnFinish = false;
+};
+
 
 
 

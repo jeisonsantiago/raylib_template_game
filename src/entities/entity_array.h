@@ -13,7 +13,7 @@ struct EntityArray{
     int next_empty_slot = 1; // since 0 is the (NIL) INVALID slot
 
     Entity& entityLastChild(EntityRef idx){
-        return entities[entities[idx.idx].first_child_idx.idx];
+        return entities[entities[idx.idx].first_child_ref.idx];
     }
 
     int get_count(){

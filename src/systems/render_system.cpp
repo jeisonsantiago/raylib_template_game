@@ -15,7 +15,8 @@ void render_entities(GameData &game_data){
     // iterate over entities and put inside render_bucket
     for (int i = 1; i < e_array.get_count(); ++i) { // awalys start with 1
         Entity &e = e_array.entities[i];
-        if(!e) continue;
+        if(!e || !e.active) continue;
+
         game_data.render_bucket[Helpers::render_layer_index(e.sprite.layer)][game_data.render_bucket_count[Helpers::render_layer_index(e.sprite.layer)]] = i;
         game_data.render_bucket_count[Helpers::render_layer_index(e.sprite.layer)]+=1;
     }

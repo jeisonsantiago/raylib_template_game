@@ -49,6 +49,9 @@ add_executable(RAYLIB_TEMPLATE_GAME
     src/systems/physics_system.h src/systems/physics_system.cpp
     src/factories/enemy.h src/factories/enemy.cpp
     src/factories/melee_attack.h src/factories/melee_attack.cpp
+    src/systems/queue_free_system.h src/systems/queue_free_system.cpp
+    src/systems/animation_system.h src/systems/animation_system.cpp
+    src/factories/ranged_attack.h src/factories/ranged_attack.cpp
 
 
 )

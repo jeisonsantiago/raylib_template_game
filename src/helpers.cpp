@@ -26,9 +26,18 @@ void update_solid_tiles(GameData &game_data)
         if(e.kind == Kind::Tile && e.collider.active){
             game_data.solid_tiles[game_data.solid_tiles_count++] = i;
         }
-
-
     }
+}
+
+float angle_from_a_to_b(Vector2 a, Vector2 b)
+{
+    Vector2 direction = Vector2Subtract(b, a);
+    float length = Vector2Length(direction);
+
+    float angle = atan2f(direction.y, direction.x); // radians
+    // or in degrees
+    float angleDeg = atan2f(direction.y, direction.x) * RAD2DEG;
+    return angleDeg;
 }
 
 }

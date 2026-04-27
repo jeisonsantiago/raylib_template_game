@@ -35,6 +35,16 @@ void create(Vector2 position, GameData &game_data, AssetManager &asset_manager)
 
     e.pos = position;
 
+    // animation
+    e.animation.active = true;
+    e.animation.startFrame = 0;
+    e.animation.currentFrame = e.animation.startFrame;
+    e.animation.frameOffset = 16;
+    e.animation.idleDuration = 1.0f;
+    e.animation.runDuration = 0.2f;
+    // e.animation.deactivateOnFinish = true;
+
+
     e.on_collision_enter = [](int e, int other, EntityArray &e_array){
         TraceLog(LOG_INFO,"ENTER: %i %i",e,other);
     };
@@ -44,10 +54,19 @@ void create(Vector2 position, GameData &game_data, AssetManager &asset_manager)
     e.on_collision_exit = [](int e, int other, EntityArray &e_array){
         TraceLog(LOG_INFO,"EXIT: %i %i",e,other);
     };
-}
 
-void melee_attack(Entity &e, float delta_time, GameData &game_data){
-    TraceLog(LOG_INFO, "ATTACK!");
+    // first child attack!
+    e.first_child_ref = MeleeAttack::create(e.pos,game_data,asset_manager);
+
+    // get it and set active to false
+    Entity &e_attack = game_data.entities.get(e.first_child_ref);
+    e_attack.on_collision_enter = [](int e_idx, int other_idx, EntityArray &e_array){
+
+        Entity &self = e_array.entities[e_idx];
+        Entity &other = e_array.entities[other_idx];
+
+        TraceLog(LOG_INFO,"ATTACK ENTER: %i %i %f", e_idx, other_idx, GetTime());
+    };
 }
 
 void update(Entity &e, float delta_time, GameData &game_data, AssetManager &asset_manager)
@@ -86,8 +105,25 @@ void update(Entity &e, float delta_time, GameData &game_data, AssetManager &asse
     if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
         if(e.attack.cooldown_counter > e.attack.cooldown){
             Vector2 center = EntityHelpers::center(e);
-            MeleeAttack::create(center,game_data, asset_manager);
-            e.attack.cooldown_counter = 0.0f;
+            // MeleeAttack::create(center,game_data, asset_manager);
+            //e.attack.cooldown_counter = 0.0f;
+
+            Entity &e_attack = game_data.entities.get(e.first_child_ref);
+            e_attack.pos = center;
+
+            e_attack.active = true;
+            e_attack.animation.active = true;
+
+            e_attack.collider.active = true;
+            // e.animation.defaultAnimation = true;
+            // e_attack.collider.active = true;
+
+            // move attack away from postion
+            Vector2 direction_normalized = Vector2Normalize(game_data.mouse_world_pos - e_attack.pos);
+            e_attack.pos += (direction_normalized * 0.8f);
+            float angle = Helpers::angle_from_a_to_b(e_attack.pos,game_data.mouse_world_pos);
+            e_attack.sprite.angle = angle + 145;
+
         }
     }
 }

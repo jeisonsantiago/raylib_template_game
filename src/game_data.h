@@ -58,8 +58,8 @@ struct GameData{
     // entity_idx player_id;
 
     // collision update
-    float collisionCallbackUpdate = 0.1f;
-    float collisionCallbackUpdateCounter = 0.0f;
+    float collision_callback_update = 0.05f;
+    float collision_callback_update_count = 0.0f;
 };
 
 

@@ -1,9 +1,8 @@
-#include "melee_attack.h"
+#include "ranged_attack.h"
 
 #include "game_data.h"
 
-namespace MeleeAttack {
-
+namespace RangedAttack {
 
 EntityRef create(Vector2 position, GameData &game_data, AssetManager &asset_manager)
 {
@@ -19,7 +18,7 @@ EntityRef create(Vector2 position, GameData &game_data, AssetManager &asset_mana
     e.collider.is_trigger = true;
 
     e.sprite.texture_asset = &asset_manager.fxAltered;
-    e.sprite.texture_index = 120; //97
+    e.sprite.texture_index = 0; //97
     e.sprite.layer = RenderLayer::PARTICLES;
     e.sprite.render_origin = Vector2{e.collider.width,e.collider.height};
 
@@ -27,13 +26,13 @@ EntityRef create(Vector2 position, GameData &game_data, AssetManager &asset_mana
     e.active = false;
 
     // animations setup
-    e.animation.animationCounter = 0;
-    e.animation.defaultAnimation = true;
-    e.animation.active = true;
-    e.animation.startFrame = 120;
-    e.animation.frameCount = 4;
-    e.animation.defaultDuration = 0.02f;
-    e.animation.deactivateOnFinish = true;
+    // e.animation.animationCounter = 0;
+    // e.animation.defaultAnimation = true;
+    // e.animation.active = true;
+    // e.animation.startFrame = 120;
+    // e.animation.frameCount = 4;
+    // e.animation.defaultDuration = 0.02f;
+    // e.animation.deactivateOnFinish = true;
 
     return e_ref;
 }
