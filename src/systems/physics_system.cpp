@@ -17,26 +17,32 @@ void physics(float delta_time, GameData &game_data)
         Entity &entity_a = e_array.entities[i];
 
         if(!entity_a.active )continue;
-        if(entity_a.collider.is_trigger) continue;
 
         if(entity_a.kind == Kind::Tile || !entity_a.collider.active) continue;
 
         //--------------- X ---------------
         // apply acceleration
-        entity_a.physics.velocity.x += entity_a.physics.acceleration.x * delta_time;
+
 
         //apply drag
-        entity_a.physics.velocity.x *= drag;
+        // entity_a.physics.velocity.x *= drag;
+        if(entity_a.kind != Kind::Particle) {
+            entity_a.physics.velocity.x += entity_a.physics.acceleration.x * delta_time;
+            entity_a.physics.velocity.x *= drag;
+        }
 
         // clamp to max speed
-        speed = std::sqrt(entity_a.physics.velocity.x * entity_a.physics.velocity.x + entity_a.physics.velocity.y * entity_a.physics.velocity.y);
-        if(speed > entity_a.physics.max_speed){
-            float scale = entity_a.physics.max_speed / speed;
-            entity_a.physics.velocity.x *= scale;
-        }
+        // speed = std::sqrt(entity_a.physics.velocity.x * entity_a.physics.velocity.x + entity_a.physics.velocity.y * entity_a.physics.velocity.y);
+
+        // if(speed > entity_a.physics.max_speed){
+        //     float scale = entity_a.physics.max_speed / speed;
+        //     entity_a.physics.velocity.x *= scale;
+        // }
 
         // integrate position
         entity_a.pos.x += entity_a.physics.velocity.x * delta_time;
+
+
         Rectangle rect_a = EntityHelpers::rect(entity_a);
 
         // see if entity_a collides with entity_b
@@ -46,7 +52,7 @@ void physics(float delta_time, GameData &game_data)
             Entity &entity_b = game_data.entities.entities[solid_idx];
             Rectangle rect_b = EntityHelpers::rect(entity_b);
 
-            if(CheckCollisionRecs(rect_a,rect_b)){
+            if(CheckCollisionRecs(rect_a,rect_b) && !entity_a.collider.is_trigger){
                 if(entity_a.physics.velocity.x > 0){
                     entity_a.pos.x = rect_b.x - (rect_a.width + entity_a.collider.offset.x) - 0.01f;;
                 }else{
@@ -56,21 +62,26 @@ void physics(float delta_time, GameData &game_data)
         }
 
         //--------------- Y ---------------
-        // apply acceleration
-        entity_a.physics.velocity.y += entity_a.physics.acceleration.y * delta_time;
+
 
         //apply drag
-        entity_a.physics.velocity.y *= drag;
+        // entity_a.physics.velocity.y *= drag;
+        if(entity_a.kind != Kind::Particle) {
+            // apply acceleration
+            entity_a.physics.velocity.y += entity_a.physics.acceleration.y * delta_time;
+            entity_a.physics.velocity.y *= drag;
+        }
 
         // clamp to max speed
-        speed = std::sqrt(entity_a.physics.velocity.x * entity_a.physics.velocity.x + entity_a.physics.velocity.y * entity_a.physics.velocity.y);
-        if(speed > entity_a.physics.max_speed){
-            float scale = entity_a.physics.max_speed / speed;
-            entity_a.physics.velocity.y *= scale;
-        }
+        // speed = std::sqrt(entity_a.physics.velocity.x * entity_a.physics.velocity.x + entity_a.physics.velocity.y * entity_a.physics.velocity.y);
+        // if(speed > entity_a.physics.max_speed){
+        //     float scale = entity_a.physics.max_speed / speed;
+        //     entity_a.physics.velocity.y *= scale;
+        // }
 
         // integrate position
         entity_a.pos.y += entity_a.physics.velocity.y * delta_time;
+
         rect_a = EntityHelpers::rect(entity_a);
 
         // see if entity_a collides with entity_b
@@ -80,12 +91,25 @@ void physics(float delta_time, GameData &game_data)
             Entity &entity_b = game_data.entities.entities[solid_idx];
             Rectangle rect_b = EntityHelpers::rect(entity_b);
 
-            if(CheckCollisionRecs(rect_a,rect_b)){
+            if(CheckCollisionRecs(rect_a,rect_b) && !entity_a.collider.is_trigger){
                 if(entity_a.physics.velocity.y > 0){
                     entity_a.pos.y = rect_b.y - (rect_a.height + entity_a.collider.offset.y) - 0.01f;;
                 }else{
                     entity_a.pos.y = (rect_b.y + rect_b.height) - (entity_a.collider.offset.y) + 0.01f;
                 }
+            }
+        }
+
+        // after X and Y integration
+        if (entity_a.kind != Kind::Particle) {
+            speed = std::sqrt(
+                entity_a.physics.velocity.x * entity_a.physics.velocity.x +
+                entity_a.physics.velocity.y * entity_a.physics.velocity.y
+            );
+            if (speed > entity_a.physics.max_speed) {
+                float scale = entity_a.physics.max_speed / speed;
+                entity_a.physics.velocity.x *= scale;
+                entity_a.physics.velocity.y *= scale;
             }
         }
     }
@@ -95,6 +119,7 @@ void physics_collision_calls(float delta_time, GameData &game_data){
 
     EntityArray &e_array = game_data.entities;
 
+    // clear all
     for (int i = 1; i < e_array.get_count(); ++i) {
         if(!e_array.used[i]) continue;
         Entity &e = e_array.entities[i];
@@ -116,14 +141,21 @@ void physics_collision_calls(float delta_time, GameData &game_data){
     for(size_t i = 1; i < e_array.get_count(); i++){
         if(!e_array.used[i]) continue;
         Entity &e_a = e_array.entities[i];
-        if(e_a.kind == Kind::Tile || !e_a.collider.active) continue;
+
+        // if(e_a.kind == Kind::Tile || !e_a.collider.active) continue;
+        if(!e_a.collider.active) continue;
 
         Rectangle rect_a = EntityHelpers::rect(e_a);
 
         for(size_t j = i+1; j < e_array.get_count(); j++){
             if(!e_array.used[j]) continue;
             Entity &e_b = e_array.entities[j];
-            if(e_b.kind == Kind::Tile || !e_b.collider.active) continue;
+
+            // check if a_collider collides with b_collider
+            if(!Helpers::has_mask(e_a.collider.layer,e_b.collider.mask)) continue;
+
+            // if(e_b.kind == Kind::Tile || !e_b.collider.active) continue;
+            if(!e_b.collider.active) continue;
 
             Rectangle rect_b = EntityHelpers::rect(e_b);
 
@@ -139,7 +171,9 @@ void physics_collision_calls(float delta_time, GameData &game_data){
     for (int i = 1; i < e_array.get_count(); ++i) {
         if(!e_array.used[i]) continue;
         Entity &e = e_array.entities[i];
-        if(e.kind == Kind::Tile || !e.collider.active) continue;
+
+        // if(e.kind == Kind::Tile || !e.collider.active) continue;
+        if(!e.collider.active) continue;
 
         for (int j = 0; j < e.collider.current_collisions_count; ++j) {
             int other = e.collider.current_collisions[j];

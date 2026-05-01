@@ -5,12 +5,12 @@
 
 struct EntityArray{
     Entity entities[MAX_ENTITIES];
-    bool used[MAX_ENTITIES]; // to keep track of used slots inside entities
-    int gen[MAX_ENTITIES]; // to keep track of used slots inside entities
+    bool used[MAX_ENTITIES] = {0}; // to keep track of used slots inside entities
+    int gen[MAX_ENTITIES] = {0}; // to keep track of used slots inside entities
 
     int count = 1;
 
-    int next_empty_slot = 1; // since 0 is the (NIL) INVALID slot
+    // int next_empty_slot = 1; // since 0 is the (NIL) INVALID slot
 
     Entity& entityLastChild(EntityRef idx){
         return entities[entities[idx.idx].first_child_ref.idx];
@@ -37,13 +37,26 @@ struct EntityArray{
         return EntityRef::nil();
     }
 
+    EntityRef get_ref(int idx){
+        return EntityRef{.idx = idx, .gen = gen[idx]};
+    }
+
     void remove(EntityRef ref){
-        used[deref(ref)] = false;
+        int index = deref(ref);
+        TraceLog(LOG_INFO,"REMOVE: %i %i %i",index, ref.idx, ref.gen);
+        used[index] = false;
     }
 
     Entity &get(EntityRef ref){
         int idx = deref(ref);
         return entities[idx];
+    }
+
+    void clear(){
+        this->count = 1;
+        memset(entities,0,sizeof(entities));
+        memset(used,0,sizeof(used));
+        memset(gen,0,sizeof(gen));
     }
 
 private:

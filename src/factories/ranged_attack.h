@@ -6,7 +6,7 @@ struct AssetManager;
 struct EntityRef;
 
 namespace RangedAttack {
-    EntityRef create(Vector2 position, GameData &game_data, AssetManager &asset_manager);
+    EntityRef create(Vector2 position, Vector2 direction, float angle, float amount,GameData &game_data, AssetManager &asset_manager);
 }
 
 #endif //

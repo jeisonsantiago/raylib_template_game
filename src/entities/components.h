@@ -16,6 +16,8 @@ struct ColliderComponent{
 
     Vector2 offset;
 
+    uint16_t layer; // which layer the entity belongs
+    uint16_t mask; // which mask the entity will interact with
 
     // float radius;
     // bool is_circle;
@@ -45,6 +47,7 @@ struct ColliderComponent{
 
 struct SpriteComponent{
     TextureAsset *texture_asset = nullptr;
+    int asset_texture_index = 0;
     int texture_index;
     float angle;
     Vector2 render_origin = {0};
@@ -59,11 +62,13 @@ struct PhysicsComponent{
 };
 
 struct HealthComponent{
+    bool active = false;
     float max_health;
     float current_health;
 };
 
 struct AttackComponent{
+    float damage = 1;
     float cooldown = 1.0f; // 1 attack per second
     float cooldown_counter = 0.0f;
 };

@@ -14,6 +14,9 @@ void render_entities(GameData &game_data){
 
     // iterate over entities and put inside render_bucket
     for (int i = 1; i < e_array.get_count(); ++i) { // awalys start with 1
+
+        if(!e_array.used[i]) continue;
+
         Entity &e = e_array.entities[i];
         if(!e || !e.active) continue;
 
@@ -25,6 +28,7 @@ void render_entities(GameData &game_data){
         for (int j = 0; j < game_data.render_bucket_count[i]; ++j) {
             int idx = game_data.render_bucket[i][j];
             Entity &e = e_array.entities[idx];
+
             DrawTexturePro(
                         e.sprite.texture_asset->texture, // texture
                         getSourceRectangleByIndex(e.sprite.texture_index,*e.sprite.texture_asset),
@@ -49,6 +53,9 @@ void render_debug(GameData &game_data)
 
     // iterate over entities and put inside render_bucket
     for (int i = 1; i < e_array.get_count(); ++i) { // awalys start with 1
+
+        if(!e_array.used[i]) continue;
+
         Entity &e = e_array.entities[i];
         if(!e) continue;
 
@@ -57,7 +64,40 @@ void render_debug(GameData &game_data)
         if(e.collider.active){
             DrawRectanglePro(rect,{0,0},0,ColorAlpha(GREEN,0.2f));
             DrawCircleV(e.pos,0.05f,RED);
-            // DrawCircleV(EntityHelpers::center(e),0.05f,GREEN);
+            DrawCircleV(EntityHelpers::center(e),0.05f,GREEN);
+        }
+
+        if(e.kind == Kind::Player){
+            // DrawLineEx(EntityHelpers::center(e),game_data.mouse_world_pos,0.01f,WHITE);
+
+        }
+    }
+
+    // mouse pos
+    // DrawCircleV(game_data.mouse_world_pos,0.05f,BLUE);
+}
+
+void render_ui(GameData &game_data)
+{
+    float barLenght = 0.4f;
+
+    EntityArray &e_array = game_data.entities;
+    for (int i = 1; i < e_array.get_count(); ++i){ // awalys start with 1
+        if(!e_array.used[i]) continue;
+        Entity &e = e_array.entities[i];
+        if(!e) continue;
+
+        if(e.health.active){
+            Vector2 position = EntityHelpers::top_left(e) - Vector2{0,0.3f};
+            Rectangle rect{position.x, position.y,0.5f,0.2f};
+            DrawRectangleRec(rect,BLACK);
+
+            float health_percentage = (e.health.current_health/e.health.max_health);
+            float health_width = health_percentage*barLenght;
+
+            rect = {position.x+0.05f,position.y+0.05f,health_width,0.1f};
+
+            DrawRectangleRec(rect,RED);
         }
     }
 }

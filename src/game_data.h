@@ -56,6 +56,7 @@ struct GameData{
     // std::vector<std::unique_ptr<UIElement>> uiElements;
 
     // entity_idx player_id;
+    EntityRef player_ref;
 
     // collision update
     float collision_callback_update = 0.05f;

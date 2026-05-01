@@ -25,6 +25,17 @@ enum class Kind{
     Tile,
 };
 
+// colision layers
+enum class ColliderLayer: uint16_t{
+    Nil =       (1 << 0),
+    Player =    (1 << 1),
+    Enemy =     (1 << 2),
+    Weapon =    (1 << 3),
+    Particle =  (1 << 4),
+    Item =      (1 << 5),
+    Tile =      (1 << 6),
+};
+
 // // Fixed size NOT DYNAMIC!
 struct Entity{
     Kind kind  = Kind::Nil;
@@ -58,7 +69,6 @@ struct Entity{
         return kind != Kind::Nil;
     }
 
-
     // bool has_child(int idx);
 };
 
@@ -68,6 +78,7 @@ namespace EntityHelpers {
     Vector2 center(Entity &e);
     Vector2 top_left(Entity &e);
     Rectangle rect(Entity &e);
+    void on_hit_damage(Entity &e, float amount);
 }
 
 #endif //

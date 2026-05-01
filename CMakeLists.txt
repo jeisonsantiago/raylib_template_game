@@ -52,6 +52,9 @@ add_executable(RAYLIB_TEMPLATE_GAME
     src/systems/queue_free_system.h src/systems/queue_free_system.cpp
     src/systems/animation_system.h src/systems/animation_system.cpp
     src/factories/ranged_attack.h src/factories/ranged_attack.cpp
+    src/systems/health_system.h src/systems/health_system.cpp
+    src/serialization/serialization_map.h src/serialization/serialization_map.cpp
+    src/systems/camera_system.h src/systems/camera_system.cpp
 
 
 )

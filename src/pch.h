@@ -12,6 +12,7 @@
 #include <fstream>
 #include <filesystem>
 #include <functional>
+#include <unordered_map>
 
 #include "raylib.h"
 #include "raymath.h"

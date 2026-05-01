@@ -6,7 +6,7 @@
 
 #define PHYSICS_STEPS 8
 
-#define MAX_ENTITIES 2048
+#define MAX_ENTITIES 5000
 
 enum class RenderLayer: uint8_t{
     DEFAULT             = 0,

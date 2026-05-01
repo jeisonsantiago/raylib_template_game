@@ -32,12 +32,25 @@ void update_solid_tiles(GameData &game_data)
 float angle_from_a_to_b(Vector2 a, Vector2 b)
 {
     Vector2 direction = Vector2Subtract(b, a);
-    float length = Vector2Length(direction);
+    // float length = Vector2Length(direction);
 
     float angle = atan2f(direction.y, direction.x); // radians
     // or in degrees
     float angleDeg = atan2f(direction.y, direction.x) * RAD2DEG;
     return angleDeg;
+}
+
+Vector2 direction_from_angle_deg(float degrees) {
+    float rad = degrees * DEG2RAD; // raylib has DEG2RAD
+    return { cosf(rad), sinf(rad) };
+}
+
+bool has_mask(uint16_t mask, uint16_t has_mask){
+    return (mask & has_mask) != 0;
+}
+
+bool has_all_masks(uint16_t mask, uint16_t required) {
+    return (mask & required) == required;
 }
 
 }

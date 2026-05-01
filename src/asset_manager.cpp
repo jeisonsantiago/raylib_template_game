@@ -28,6 +28,14 @@ void AssetManager::loadAll()
     updateTileCount(this->itemsNoShadow);
 
     this->pixelFont = LoadFont(RESOURCES_PATH "/fonts/pixantiqua.ttf");
+
+    // workaround for serialization
+    this->textures.push_back(&this->world);
+    this->textures.push_back(&this->interface);
+    this->textures.push_back(&this->characters);
+    this->textures.push_back(&this->fxAltered);
+    this->textures.push_back(&this->fx);
+    this->textures.push_back(&this->itemsNoShadow);
 }
 
 Rectangle getSourceRectangleByIndex(int index, TextureAsset &textureAsset)

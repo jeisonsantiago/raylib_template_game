@@ -15,10 +15,10 @@ void Editor::drawGUI(GameData &game_data, AssetManager& asset_manager)
         game_data.mouse_over_editor_ui = false;
     }
 
+    // set camera section in the UI
     ImGui::Text("Camera:");
     ImGui::SliderFloat("Camera Speed",&game_data.camera_speed,10,100);
-    ImGui::SliderFloat("Camera Zoom",&game_data.camera.zoom,1,100);
-
+    ImGui::SliderFloat("Camera Zoom",&game_data.camera.zoom,1,300);
 
     ImGui::Separator();
     ImGui::Text("Map:");

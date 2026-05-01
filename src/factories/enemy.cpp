@@ -8,6 +8,8 @@ void create(Vector2 position, GameData &game_data, AssetManager &asset_manager)
 {
     auto e_ref = game_data.entities.add(Kind::Enemy);
     auto &e = game_data.entities.get(e_ref);
+
+    e.sprite.asset_texture_index = 2;
     e.sprite.texture_asset = &asset_manager.characters;
     e.sprite.texture_index = 4;
     e.sprite.layer = RenderLayer::ENEMIES;
@@ -25,6 +27,17 @@ void create(Vector2 position, GameData &game_data, AssetManager &asset_manager)
     // e.collider.offset = {0,0};
     // e.collider.offset = {-1,1};
 
+    // health
+    e.health.active = true;
+    e.health.max_health = 10;
+    e.health.current_health = e.health.max_health;
+
+    // Entity belongs to
+    e.collider.layer |= (uint16_t)ColliderLayer::Enemy;
+
+    // Entity interacts with
+    e.collider.mask |= (uint16_t)ColliderLayer::Particle;
+
 
     // physics
     e.physics.move_force = 100.0f;
@@ -34,9 +47,9 @@ void create(Vector2 position, GameData &game_data, AssetManager &asset_manager)
 
     e.pos = position;
 
-    e.on_collision_enter = [](int e, int other, EntityArray &e_array){
-        // TraceLog(LOG_INFO,"ENTER");
-    };
+    // e.on_collision_enter = [](int e, int other, EntityArray &e_array){
+    //     // TraceLog(LOG_INFO,"ENTER");
+    // };
 }
 
 
